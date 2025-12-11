@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Host Settings | Oral Assignment Grader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo">
+                <a href="{{ url_for('host_dashboard') }}" class="logo-link">
+                    <span class="logo-osu">OSU</span>
+                    <h1>Oral Assignment Grader</h1>
+                </a>
+            </div>
+            <div class="header-info">
+                <span class="host-badge">HOST</span>
+                <a href="{{ url_for('host_dashboard') }}" class="btn btn-small btn-secondary">Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-small btn-outline">Logout</a>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Grading Settings</h2>
+                <p>Configure the LLM system prompt for grading</p>
+            </div>
+
+            {% if saved %}
+            <div class="alert alert-success">
+                Settings saved successfully. The new prompt will be used for future submissions.
+            </div>
+            {% endif %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Custom System Prompt</h3>
+                </div>
+                <div class="card-body">
+                    <p class="instructions">
+                        Enter a custom system prompt to control how the LLM grades student responses. 
+                        Leave empty to use the default grading rubric. The prompt should instruct 
+                        the LLM to return JSON with the required fields.
+                    </p>
+                    
+                    <form method="POST">
+                        <div class="form-group">
+                            <label for="custom_prompt">Custom Grading Prompt</label>
+                            <textarea 
+                                id="custom_prompt" 
+                                name="custom_prompt" 
+                                class="prompt-textarea"
+                                placeholder="Enter your custom grading instructions here..."
+                            >{{ settings.custom_prompt or '' }}</textarea>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary">
+                                Save Settings
+                            </button>
+                            <button type="button" id="btn-load-default" class="btn btn-secondary">
+                                Load Default Rubric
+                            </button>
+                            <button type="button" id="btn-clear" class="btn btn-outline">
+                                Clear (Use Default)
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Default Grading Rubric</h3>
+                </div>
+                <div class="card-body">
+                    <p class="instructions">
+                        This is the default rubric used when no custom prompt is set. 
+                        You can copy and modify this as a starting point.
+                    </p>
+                    <div class="default-rubric-box">
+                        <pre id="default-rubric">{{ default_rubric }}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Required JSON Output Format</h3>
+                </div>
+                <div class="card-body">
+                    <p class="instructions">
+                        Your custom prompt should instruct the LLM to return a JSON response 
+                        with these keys:
+                    </p>
+                    <div class="code-box">
+<pre>{
+    "total_score": &lt;number&gt;,
+    "category_scores": {
+        "conceptual_understanding": &lt;number out of 20&gt;,
+        "application_of_theories": &lt;number out of 15&gt;,
+        "use_of_terminology": &lt;number out of 15&gt;,
+        "critical_thinking": &lt;number out of 15&gt;,
+        "clarity_of_explanation": &lt;number out of 15&gt;,
+        "completeness": &lt;number out of 10&gt;,
+        "examples_and_evidence": &lt;number out of 10&gt;
+    },
+    "grading_reasoning": "&lt;explanation of scoring&gt;",
+    "strengths": ["strength 1", "strength 2"],
+    "improvements": ["improvement 1", "improvement 2"],
+    "overall_comments": "&lt;summary&gt;"
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Oral Assignment Grader - Joseph Slade and Alina Hyk - CS 290</p>
+        </footer>
+    </div>
+
+    <script>
+        const defaultRubric = document.getElementById('default-rubric').textContent;
+        const textarea = document.getElementById('custom_prompt');
+        
+        document.getElementById('btn-load-default').addEventListener('click', () => {
+            textarea.value = defaultRubric;
+        });
+        
+        document.getElementById('btn-clear').addEventListener('click', () => {
+            textarea.value = '';
+        });
+    </script>
+</body>
+</html>
