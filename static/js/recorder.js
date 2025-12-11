@@ -391,7 +391,121 @@ Elements.btnNewSubmission.addEventListener('click', () => {
     goToStep('info');
 });
 
-// TO DO: Styles for results
+// Styles for results
+const resultsStyles = document.createElement('style');
+resultsStyles.textContent = `
+    .results-summary {
+        text-align: center;
+        margin-bottom: var(--space-xl);
+    }
+    
+    .score-display {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.25rem;
+        padding: var(--space-lg) var(--space-xl);
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--space-md);
+    }
+    
+    .score-display.score-high {
+        background: rgba(46, 125, 50, 0.2);
+        color: #66BB6A;
+    }
+    
+    .score-display.score-medium {
+        background: rgba(249, 168, 37, 0.2);
+        color: #F9A825;
+    }
+    
+    .score-display.score-low {
+        background: rgba(198, 40, 40, 0.2);
+        color: #EF5350;
+    }
+    
+    .big-score {
+        font-size: 3rem;
+        font-weight: 700;
+    }
+    
+    .score-max {
+        font-size: 1.5rem;
+        opacity: 0.7;
+    }
+    
+    .results-sections {
+        display: grid;
+        gap: var(--space-lg);
+    }
+    
+    .result-section {
+        background: var(--color-bg-dark);
+        padding: var(--space-lg);
+        border-radius: var(--radius-md);
+    }
+    
+    .result-section h4 {
+        margin-bottom: var(--space-md);
+        color: var(--color-primary-light);
+    }
+    
+    .result-section ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+    
+    .result-section ul li {
+        color: var(--color-text-secondary);
+        padding-left: var(--space-md);
+        position: relative;
+    }
+    
+    .result-section ul li::before {
+        content: "-";
+        position: absolute;
+        left: 0;
+        color: var(--color-primary);
+    }
+    
+    .result-section p {
+        color: var(--color-text-secondary);
+        line-height: 1.7;
+    }
+    
+    .result-section.note {
+        background: rgba(249, 168, 37, 0.1);
+        border: 1px solid #F9A825;
+    }
+    
+    .mini-breakdown {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
+    }
+    
+    .mini-score-item {
+        display: flex;
+        justify-content: space-between;
+        padding: var(--space-xs) var(--space-sm);
+        background: var(--color-bg-medium);
+        border-radius: var(--radius-sm);
+        font-size: 0.8rem;
+    }
+    
+    .mini-cat {
+        color: var(--color-text-secondary);
+        text-transform: capitalize;
+    }
+    
+    .mini-val {
+        color: var(--color-primary-light);
+        font-weight: 600;
+    }
+`;
+document.head.appendChild(resultsStyles);
+
 
 console.log('Oral Assignment Grader initialized');
 console.log(`Loaded ${QUIZ_QUESTIONS.length} psychology questions`);
