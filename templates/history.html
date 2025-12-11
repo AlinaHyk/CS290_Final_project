@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My History | Oral Assignment Grader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo">
+                <a href="{{ url_for('index') }}" class="logo-link">
+                    <span class="logo-osu">OSU</span>
+                    <h1>Oral Assignment Grader</h1>
+                </a>
+            </div>
+            <div class="header-info">
+                <span class="user-badge">{{ username }}</span>
+                <a href="{{ url_for('index') }}" class="btn btn-small btn-primary">New Quiz</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-small btn-outline">Logout</a>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>My Quiz History</h2>
+                <p>View your past submissions and results</p>
+            </div>
+
+            {% if submissions %}
+            <div class="history-grid">
+                {% for sub in submissions %}
+                <div class="history-card">
+                    <div class="history-card-header">
+                        <span class="history-date">{{ sub.timestamp_readable or sub.timestamp }}</span>
+                        <span class="score-pill {% if sub.grading_result.total_score >= 80 %}score-high{% elif sub.grading_result.total_score >= 60 %}score-medium{% else %}score-low{% endif %}">
+                            {{ sub.grading_result.total_score }}/100
+                        </span>
+                    </div>
+                    <div class="history-card-body">
+                        <p class="submission-id">ID: {{ sub.submission_id }}</p>
+                        {% if sub.grading_result.overall_comments %}
+                        <p class="history-summary">{{ sub.grading_result.overall_comments[:150] }}{% if sub.grading_result.overall_comments|length > 150 %}...{% endif %}</p>
+                        {% endif %}
+                    </div>
+                    <div class="history-card-actions">
+                        <a href="{{ url_for('view_results', submission_id=sub.submission_id) }}" class="btn btn-small btn-primary">
+                            View Details
+                        </a>
+                        <a href="{{ url_for('download_pdf', submission_id=sub.submission_id) }}" class="btn btn-small btn-secondary">
+                            Download PDF
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-body center">
+                    <div class="empty-state">
+                        <span class="empty-icon">0</span>
+                        <h3>No Submissions Yet</h3>
+                        <p>You haven't taken any quizzes yet. Start your first one now!</p>
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">Take a Quiz</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </main>
+
+        <footer class="footer">
+            <p>Oral Assignment Grader - Joseph Slade and Alina Hyk - CS 290</p>
+        </footer>
+    </div>
+</body>
+</html>

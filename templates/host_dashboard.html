@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Host Dashboard | Oral Assignment Grader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo">
+                <span class="logo-osu">OSU</span>
+                <h1>Oral Assignment Grader</h1>
+            </div>
+            <div class="header-info">
+                <span class="host-badge">HOST</span>
+                <a href="{{ url_for('host_settings') }}" class="btn btn-small btn-secondary">Settings</a>
+                <a href="{{ url_for('host_users') }}" class="btn btn-small btn-secondary">Users</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-small btn-outline">Logout</a>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h2>Host Dashboard</h2>
+                    <p>View all student submissions</p>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <span class="stat-value">{{ submissions|length }}</span>
+                        <span class="stat-label">Total Submissions</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">{{ user_count }}</span>
+                        <span class="stat-label">Registered Users</span>
+                    </div>
+                </div>
+            </div>
+
+            {% if submissions %}
+            <div class="submissions-table-container">
+                <table class="submissions-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Submission ID</th>
+                            <th>Date/Time</th>
+                            <th>Score</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sub in submissions %}
+                        <tr>
+                            <td>
+                                <strong>{{ sub.username }}</strong>
+                            </td>
+                            <td>
+                                <code>{{ sub.submission_id }}</code>
+                            </td>
+                            <td>{{ sub.timestamp_readable or sub.timestamp }}</td>
+                            <td>
+                                <span class="score-pill {% if sub.grading_result.total_score >= 80 %}score-high{% elif sub.grading_result.total_score >= 60 %}score-medium{% else %}score-low{% endif %}">
+                                    {{ sub.grading_result.total_score }}/100
+                                </span>
+                            </td>
+                            <td class="actions-cell">
+                                <a href="{{ url_for('view_results', submission_id=sub.submission_id) }}" class="btn btn-small btn-primary">
+                                    View
+                                </a>
+                                <a href="{{ url_for('download_pdf', submission_id=sub.submission_id) }}" class="btn btn-small btn-secondary">
+                                    PDF
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-body center">
+                    <div class="empty-state">
+                        <span class="empty-icon">0</span>
+                        <h3>No Submissions Yet</h3>
+                        <p>When students submit their oral quizzes, they will appear here.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </main>
+
+        <footer class="footer">
+            <p>Oral Assignment Grader - Joseph Slade and Alina Hyk - CS 290</p>
+        </footer>
+    </div>
+</body>
+</html>
