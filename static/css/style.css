@@ -1,0 +1,79 @@
+:root {
+    /* OSU Colors */
+    --color-primary: #D73F09;
+    --color-primary-dark: #B63506;
+    --color-primary-light: #FF6B35;
+    
+    --color-success: #2E7D32;
+    --color-success-dark: #1B5E20;
+    
+    --color-warning: #F9A825;
+    --color-danger: #C62828;
+    
+    /* Background Colors */
+    --color-bg-dark: #1a1a1a;
+    --color-bg-medium: #262626;
+    --color-bg-light: #333333;
+    
+    /* Text Colors */
+    --color-text-primary: #f5f5f5;
+    --color-text-secondary: #b0b0b0;
+    --color-text-muted: #808080;
+    
+    --color-border: #404040;
+    --color-border-light: #333333;
+    
+    /* Typography */
+    --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, var(--color-bg-medium), var(--color-bg-dark));
+    border-bottom: 3px solid var(--color-primary);
+    padding: var(--space-md) var(--space-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo-osu {
+    background: var(--color-primary);
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    letter-spacing: 0.05em;
+}
+
+.logo h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
