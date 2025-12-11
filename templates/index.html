@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oral Assignment Grader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo">
+                <span class="logo-osu">OSU</span>
+                <h1>Oral Assignment Grader</h1>
+            </div>
+            <div class="header-info">
+                <span class="user-badge">{{ username }}</span>
+                <a href="{{ url_for('user_history') }}" class="btn btn-small btn-secondary">History</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-small btn-outline">Logout</a>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Step 1: Instructions -->
+            <section id="step-info" class="step active">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="step-number">1</span>
+                        <h2>Welcome, {{ username }}</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="instructions">
+                            This quiz will record your oral responses to psychology questions. 
+                            You will answer 10 questions, and your responses will be transcribed 
+                            and graded automatically.
+                        </p>
+                        <div class="info-box">
+                            <h4>Instructions</h4>
+                            <ul>
+                                <li>Allow camera and microphone access when prompted</li>
+                                <li>Speak clearly and at a normal pace</li>
+                                <li>Answer each question thoroughly before clicking Next</li>
+                                <li>You cannot go back to previous questions</li>
+                            </ul>
+                        </div>
+                        <button id="btn-start-setup" class="btn btn-primary btn-lg">
+                            Continue to Camera Setup
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: Camera Setup -->
+            <section id="step-camera" class="step">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="step-number">2</span>
+                        <h2>Camera and Microphone Setup</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="instructions">
+                            Please allow access to your camera and microphone when prompted.
+                        </p>
+                        
+                        <div class="video-container">
+                            <video id="preview-video" autoplay muted playsinline></video>
+                            <div id="camera-placeholder" class="camera-placeholder">
+                                <span class="placeholder-icon">CAM</span>
+                                <p>Camera preview will appear here</p>
+                            </div>
+                        </div>
+                        
+                        <div class="device-status">
+                            <div class="status-item" id="camera-status">
+                                <span class="status-icon">...</span>
+                                <span>Camera: Waiting</span>
+                            </div>
+                            <div class="status-item" id="mic-status">
+                                <span class="status-icon">...</span>
+                                <span>Microphone: Waiting</span>
+                            </div>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button id="btn-enable-camera" class="btn btn-primary">
+                                Enable Camera and Microphone
+                            </button>
+                            <button id="btn-start-quiz" class="btn btn-success" disabled>
+                                Start Quiz
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Quiz Recording -->
+            <section id="step-quiz" class="step">
+                <div class="quiz-layout">
+                    <div class="card question-card">
+                        <div class="card-header">
+                            <div class="question-progress">
+                                <span id="question-counter">Question 1 of {{ questions|length }}</span>
+                                <div class="progress-bar">
+                                    <div id="progress-fill" class="progress-fill" style="width: 10%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="question-display" class="question-display"></div>
+                            <div class="question-meta">
+                                <span id="question-points" class="points-badge">10 points</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card video-card">
+                        <div class="card-header">
+                            <h3>Your Response</h3>
+                            <div id="recording-indicator" class="recording-indicator hidden">
+                                <span class="rec-dot"></span>
+                                <span>REC</span>
+                                <span id="recording-time">00:00</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="video-container recording-video">
+                                <video id="recording-video" autoplay muted playsinline></video>
+                            </div>
+                            
+                            <div class="recording-controls">
+                                <button id="btn-begin-recording" class="btn btn-danger btn-lg">
+                                    Begin Recording
+                                </button>
+                                <button id="btn-next-question" class="btn btn-primary btn-lg" disabled>
+                                    Next Question
+                                </button>
+                                <button id="btn-submit" class="btn btn-success btn-lg hidden">
+                                    Submit Recording
+                                </button>
+                            </div>
+                            
+                            <p class="recording-tip" id="recording-tip">
+                                Tip: Speak clearly and take your time answering each question.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: Processing -->
+            <section id="step-processing" class="step">
+                <div class="card processing-card">
+                    <div class="card-body center">
+                        <div class="spinner"></div>
+                        <h2>Processing Your Submission</h2>
+                        <p id="processing-status">Uploading video...</p>
+                        <div class="processing-steps">
+                            <div class="processing-step" id="proc-upload">
+                                <span class="proc-icon">1</span>
+                                <span>Uploading video</span>
+                            </div>
+                            <div class="processing-step" id="proc-audio">
+                                <span class="proc-icon">2</span>
+                                <span>Extracting audio</span>
+                            </div>
+                            <div class="processing-step" id="proc-transcript">
+                                <span class="proc-icon">3</span>
+                                <span>Generating transcript</span>
+                            </div>
+                            <div class="processing-step" id="proc-grading">
+                                <span class="proc-icon">4</span>
+                                <span>AI grading in progress</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 5: Results -->
+            <section id="step-results" class="step">
+                <div class="card results-card">
+                    <div class="card-header">
+                        <h2>Grading Complete</h2>
+                    </div>
+                    <div class="card-body">
+                        <div id="results-content"></div>
+                        <div class="button-group">
+                            <button id="btn-new-submission" class="btn btn-primary">
+                                Take Another Quiz
+                            </button>
+                            <a id="btn-download-pdf" href="#" class="btn btn-success">
+                                Download PDF
+                            </a>
+                            <a id="btn-view-details" href="#" class="btn btn-secondary">
+                                View Full Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Oral Assignment Grader - Joseph Slade and Alina Hyk - CS 290</p>
+        </footer>
+    </div>
+
+    <script>
+        const QUIZ_QUESTIONS = {{ questions | tojson }};
+        const USERNAME = "{{ username }}";
+    </script>
+    <script src="{{ url_for('static', filename='js/recorder.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - {{ submission.username }} | Oral Assignment Grader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo">
+                <a href="{{ url_for('index') }}" class="logo-link">
+                    <span class="logo-osu">OSU</span>
+                    <h1>Oral Assignment Grader</h1>
+                </a>
+            </div>
+            <div class="header-info">
+                <span class="badge">Results</span>
+                {% if is_host %}
+                <a href="{{ url_for('host_dashboard') }}" class="btn btn-small btn-secondary">Dashboard</a>
+                {% else %}
+                <a href="{{ url_for('user_history') }}" class="btn btn-small btn-secondary">History</a>
+                {% endif %}
+                <a href="{{ url_for('logout') }}" class="btn btn-small btn-outline">Logout</a>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="results-banner">
+                <div class="student-info">
+                    <h2>{{ submission.username }}</h2>
+                    <p>Submission ID: {{ submission.submission_id }}</p>
+                    <p>{{ submission.timestamp_readable or submission.timestamp }}</p>
+                </div>
+                <div class="score-circle {% if submission.grading_result.total_score >= 80 %}score-high{% elif submission.grading_result.total_score >= 60 %}score-medium{% else %}score-low{% endif %}">
+                    <span class="score-value">{{ submission.grading_result.total_score }}</span>
+                    <span class="score-label">/ 100</span>
+                </div>
+            </div>
+
+            <div class="results-actions-top">
+                <a href="{{ url_for('download_pdf', submission_id=submission.submission_id) }}" class="btn btn-success">
+                    Download PDF Report
+                </a>
+            </div>
+
+            <div class="results-grid">
+                <!-- Score Breakdown (7 Categories) -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Score Breakdown</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if submission.grading_result.category_scores %}
+                        <div class="score-breakdown">
+                            {% set max_scores = {
+                                'conceptual_understanding': 20,
+                                'application_of_theories': 15,
+                                'use_of_terminology': 15,
+                                'critical_thinking': 15,
+                                'clarity_of_explanation': 15,
+                                'completeness': 10,
+                                'examples_and_evidence': 10
+                            } %}
+                            {% for category, score in submission.grading_result.category_scores.items() %}
+                            {% set max_score = max_scores.get(category, 15) %}
+                            <div class="score-item">
+                                <div class="score-item-header">
+                                    <span class="category-name">{{ category | replace('_', ' ') | title }}</span>
+                                    <span class="category-score">{{ score }} / {{ max_score }}</span>
+                                </div>
+                                <div class="score-bar">
+                                    <div class="score-bar-fill" style="width: {{ (score / max_score * 100) | int }}%"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p>Category breakdown not available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Grading Reasoning -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Grading Reasoning</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if submission.grading_result.grading_reasoning %}
+                        <div class="reasoning-box">
+                            <pre>{{ submission.grading_result.grading_reasoning }}</pre>
+                        </div>
+                        {% else %}
+                        <p>Detailed grading reasoning not available.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Strengths -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Strengths</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if submission.grading_result.strengths %}
+                        <ul class="feedback-list strengths">
+                            {% for strength in submission.grading_result.strengths %}
+                            <li>{{ strength }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p>No specific strengths noted.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Areas for Improvement -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Areas for Improvement</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if submission.grading_result.improvements %}
+                        <ul class="feedback-list improvements">
+                            {% for improvement in submission.grading_result.improvements %}
+                            <li>{{ improvement }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p>No specific improvements noted.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Overall Comments -->
+                <div class="card full-width">
+                    <div class="card-header">
+                        <h3>Overall Comments</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="overall-comments">
+                            {{ submission.grading_result.overall_comments or "No additional comments." }}
+                        </p>
+                        {% if submission.grading_result.note %}
+                        <div class="note-box">
+                            <strong>Note:</strong> {{ submission.grading_result.note }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Transcript -->
+                <div class="card full-width">
+                    <div class="card-header">
+                        <h3>Your Transcript</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="transcript-box">
+                            <pre>{{ submission.transcript_text }}</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Questions -->
+                <div class="card full-width">
+                    <div class="card-header">
+                        <h3>Questions</h3>
+                    </div>
+                    <div class="card-body">
+                        <ol class="questions-list">
+                            {% for question in submission.questions %}
+                            <li>
+                                <strong>{{ question.question }}</strong>
+                                <span class="points-badge">{{ question.points }} points</span>
+                            </li>
+                            {% endfor %}
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-actions">
+                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                    Take Another Quiz
+                </a>
+                <a href="{{ url_for('download_pdf', submission_id=submission.submission_id) }}" class="btn btn-success btn-lg">
+                    Download PDF
+                </a>
+                {% if is_host %}
+                <a href="{{ url_for('host_dashboard') }}" class="btn btn-secondary btn-lg">
+                    Back to Dashboard
+                </a>
+                {% else %}
+                <a href="{{ url_for('user_history') }}" class="btn btn-secondary btn-lg">
+                    View History
+                </a>
+                {% endif %}
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Oral Assignment Grader - Joseph Slade and Alina Hyk - CS 290</p>
+        </footer>
+    </div>
+</body>
+</html>
