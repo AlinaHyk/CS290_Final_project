@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users | Oral Assignment Grader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo">
+                <a href="{{ url_for('host_dashboard') }}" class="logo-link">
+                    <span class="logo-osu">OSU</span>
+                    <h1>Oral Assignment Grader</h1>
+                </a>
+            </div>
+            <div class="header-info">
+                <span class="host-badge">HOST</span>
+                <a href="{{ url_for('host_dashboard') }}" class="btn btn-small btn-secondary">Dashboard</a>
+                <a href="{{ url_for('host_settings') }}" class="btn btn-small btn-secondary">Settings</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-small btn-outline">Logout</a>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Registered Users</h2>
+                <p>{{ users|length }} total users</p>
+            </div>
+
+            {% if users %}
+            <div class="submissions-table-container">
+                <table class="submissions-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Registered</th>
+                            <th>Submissions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for username, data in users.items() %}
+                        <tr>
+                            <td>
+                                <strong>{{ username }}</strong>
+                            </td>
+                            <td>{{ data.created[:10] if data.created else 'Unknown' }}</td>
+                            <td>
+                                <span class="submission-count">{{ data.submissions|length }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="card">
+                <div class="card-body center">
+                    <div class="empty-state">
+                        <span class="empty-icon">0</span>
+                        <h3>No Users Registered</h3>
+                        <p>No students have registered yet.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </main>
+
+        <footer class="footer">
+            <p>Oral Assignment Grader - Joseph Slade and Alina Hyk - CS 290</p>
+        </footer>
+    </div>
+</body>
+</html>
