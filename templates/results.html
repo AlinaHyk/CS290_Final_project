@@ -23,7 +23,7 @@
                 {% if is_host %}
                 <a href="{{ url_for('host_dashboard') }}" class="btn btn-small btn-secondary">Dashboard</a>
                 {% else %}
-                <a href="{{ url_for('user_history') }}" class="btn btn-small btn-secondary">History</a>
+                <a href="{{ url_for('history') }}" class="btn btn-small btn-secondary">History</a>
                 {% endif %}
                 <a href="{{ url_for('logout') }}" class="btn btn-small btn-outline">Logout</a>
             </div>
@@ -196,7 +196,7 @@
                     Back to Dashboard
                 </a>
                 {% else %}
-                <a href="{{ url_for('user_history') }}" class="btn btn-secondary btn-lg">
+                <a href="{{ url_for('history') }}" class="btn btn-secondary btn-lg">
                     View History
                 </a>
                 {% endif %}

@@ -134,7 +134,9 @@ Elements.btnEnableCamera.addEventListener('click', requestMediaAccess);
 
 Elements.btnStartQuiz.addEventListener('click', () => {
     Elements.recordingVideo.srcObject = AppState.mediaStream;
-    showQuestion(0);
+    // Don't show question yet - wait for "Begin Recording" button
+    Elements.questionDisplay.textContent = 'Press "Begin Recording" to start the quiz';
+    Elements.questionPoints.textContent = '';
     goToStep('quiz');
 });
 
@@ -159,16 +161,19 @@ function showQuestion(index) {
 
 function startRecording() {
     AppState.recordedChunks = [];
-    
+
+    // Show the first question when recording starts
+    showQuestion(0);
+
     // Try different codecs for better compatibility
     const mimeTypes = [
         'video/webm;codecs=vp9,opus',
-        'video/webm;codecs=vp8,opus', 
+        'video/webm;codecs=vp8,opus',
         'video/webm;codecs=h264,opus',
         'video/webm',
         'video/mp4'
     ];
-    
+
     let selectedMimeType = '';
     for (const mimeType of mimeTypes) {
         if (MediaRecorder.isTypeSupported(mimeType)) {
@@ -177,7 +182,7 @@ function startRecording() {
             break;
         }
     }
-    
+
     try {
         const options = selectedMimeType ? { mimeType: selectedMimeType } : {};
         AppState.mediaRecorder = new MediaRecorder(AppState.mediaStream, options);
@@ -186,28 +191,28 @@ function startRecording() {
         console.log('Fallback to default MediaRecorder');
         AppState.mediaRecorder = new MediaRecorder(AppState.mediaStream);
     }
-    
+
     AppState.mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
             AppState.recordedChunks.push(event.data);
             console.log(`Chunk recorded: ${event.data.size} bytes`);
         }
     };
-    
+
     AppState.mediaRecorder.onerror = (event) => {
         console.error('MediaRecorder error:', event.error);
     };
-    
+
     AppState.mediaRecorder.start(1000);
     AppState.isRecording = true;
-    
+
     Elements.recordingIndicator.classList.remove('hidden');
     Elements.btnBeginRecording.classList.add('hidden');
     Elements.btnNextQuestion.disabled = false;
-    
+
     AppState.recordingStartTime = Date.now();
     AppState.timerInterval = setInterval(updateTimer, 1000);
-    
+
     Elements.recordingTip.textContent = 'Recording in progress. Speak clearly into your microphone.';
 }
 
@@ -367,7 +372,7 @@ function displayResults(result) {
     resultsHtml += `</div>`;
     
     Elements.resultsContent.innerHTML = resultsHtml;
-    Elements.btnDownloadPdf.href = `/download-pdf/${result.submission_id}`;
+    Elements.btnDownloadPdf.href = `/download_pdf/${result.submission_id}`;
     Elements.btnViewDetails.href = `/results/${result.submission_id}`;
     
     goToStep('results');

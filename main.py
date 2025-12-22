@@ -19,6 +19,10 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, s
 from werkzeug.utils import secure_filename
 import subprocess
 
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
+
 # For audio extraction
 try:
     from moviepy.editor import VideoFileClip
@@ -546,3 +550,314 @@ Include detailed grading_reasoning explaining how you evaluated each category.
     
     # Fallback mock grading
     return generate_mock_grade(transcript)
+
+def generate_mock_grade(transcript):
+    """Generate mock grading data when LLM is unavailable"""
+    word_count = len(transcript.split())
+
+    # Simple scoring based on transcript length and content
+    base_score = min(60, word_count // 10)
+
+    return {
+        "total_score": base_score + 20,
+        "category_scores": {
+            "conceptual_understanding": min(20, base_score // 4),
+            "application_of_theories": min(15, base_score // 5),
+            "use_of_terminology": min(15, base_score // 5),
+            "critical_thinking": min(15, base_score // 5),
+            "clarity_of_explanation": min(15, base_score // 5),
+            "completeness": min(10, base_score // 8),
+            "examples_and_evidence": min(10, base_score // 8)
+        },
+        "grading_reasoning": "Note: This is mock grading data. Please configure your ANTHROPIC_API_KEY environment variable for AI-powered grading.",
+        "strengths": [
+            "Provided oral responses to the quiz questions",
+            f"Transcript length: {word_count} words"
+        ],
+        "improvements": [
+            "Configure ANTHROPIC_API_KEY for detailed AI feedback",
+            "Ensure clear articulation in responses"
+        ],
+        "overall_comments": "Mock grading active. Set up your Anthropic API key for real AI-powered grading and feedback."
+    }
+
+
+@app.route('/results/<submission_id>')
+@login_required
+def results(submission_id):
+    """Display detailed results for a submission"""
+    data_path = os.path.join(app.config['DATA_FOLDER'], f"{submission_id}.json")
+
+    if not os.path.exists(data_path):
+        return "Submission not found", 404
+
+    with open(data_path, 'r') as f:
+        submission_data = json.load(f)
+
+    # Check if user owns this submission or is host
+    if not session.get('is_host') and submission_data['username'] != session['user']:
+        return "Unauthorized", 403
+
+    return render_template('results.html',
+                         submission=submission_data,
+                         username=session['user'])
+
+
+@app.route('/history')
+@login_required
+def history():
+    """Show user's submission history"""
+    if session.get('is_host'):
+        return redirect(url_for('host_dashboard'))
+
+    username = session['user']
+    users = load_users()
+
+    submissions = []
+    if username in users:
+        for sub_id in users[username]['submissions']:
+            data_path = os.path.join(app.config['DATA_FOLDER'], f"{sub_id}.json")
+            if os.path.exists(data_path):
+                with open(data_path, 'r') as f:
+                    sub_data = json.load(f)
+                    submissions.append({
+                        'id': sub_id,
+                        'timestamp': sub_data.get('timestamp_readable', sub_data.get('timestamp', 'Unknown')),
+                        'score': sub_data['grading_result'].get('total_score', 'N/A')
+                    })
+
+    # Sort by most recent first
+    submissions.reverse()
+
+    return render_template('history.html',
+                         submissions=submissions,
+                         username=username)
+
+
+@app.route('/host/dashboard')
+@host_required
+def host_dashboard():
+    """Host dashboard showing all submissions"""
+    submissions = []
+
+    # Get all submission files
+    if os.path.exists(app.config['DATA_FOLDER']):
+        for filename in os.listdir(app.config['DATA_FOLDER']):
+            if filename.endswith('.json') and filename != 'users.json' and filename != 'host_settings.json':
+                filepath = os.path.join(app.config['DATA_FOLDER'], filename)
+                with open(filepath, 'r') as f:
+                    data = json.load(f)
+                    submissions.append({
+                        'id': data['submission_id'],
+                        'username': data['username'],
+                        'timestamp': data.get('timestamp_readable', data.get('timestamp', 'Unknown')),
+                        'score': data['grading_result'].get('total_score', 'N/A')
+                    })
+
+    # Sort by most recent first
+    submissions.sort(key=lambda x: x['timestamp'], reverse=True)
+
+    return render_template('host_dashboard.html',
+                         submissions=submissions,
+                         username=session['user'])
+
+
+@app.route('/host/settings', methods=['GET', 'POST'])
+@host_required
+def host_settings():
+    """Host settings page for customizing grading prompt"""
+    message = None
+
+    if request.method == 'POST':
+        custom_prompt = request.form.get('custom_prompt', '').strip()
+        settings = {'custom_prompt': custom_prompt}
+        save_host_settings(settings)
+        message = "Settings saved successfully!"
+
+    settings = load_host_settings()
+    current_prompt = settings.get('custom_prompt', '')
+
+    return render_template('host_settings.html',
+                         current_prompt=current_prompt,
+                         default_prompt=DEFAULT_GRADING_RUBRIC,
+                         message=message,
+                         username=session['user'])
+
+
+@app.route('/host/users')
+@host_required
+def host_users():
+    """Host page showing all registered users"""
+    users = load_users()
+
+    user_list = []
+    for username, data in users.items():
+        user_list.append({
+            'username': username,
+            'created': data.get('created', 'Unknown'),
+            'submission_count': len(data.get('submissions', []))
+        })
+
+    # Sort by username
+    user_list.sort(key=lambda x: x['username'])
+
+    return render_template('host_users.html',
+                         users=user_list,
+                         username=session['user'])
+
+
+@app.route('/download_pdf/<submission_id>')
+@login_required
+def download_pdf(submission_id):
+    """Generate and download PDF report for a submission"""
+    data_path = os.path.join(app.config['DATA_FOLDER'], f"{submission_id}.json")
+
+    if not os.path.exists(data_path):
+        return "Submission not found", 404
+
+    with open(data_path, 'r') as f:
+        submission_data = json.load(f)
+
+    # Check if user owns this submission or is host
+    if not session.get('is_host') and submission_data['username'] != session['user']:
+        return "Unauthorized", 403
+
+    # Generate PDF
+    pdf_buffer = io.BytesIO()
+    doc = SimpleDocTemplate(pdf_buffer, pagesize=letter,
+                           rightMargin=72, leftMargin=72,
+                           topMargin=72, bottomMargin=18)
+
+    # Container for PDF elements
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Title style
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        textColor=colors.HexColor('#2c3e50'),
+        spaceAfter=30,
+        alignment=TA_CENTER
+    )
+
+    # Heading style
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontSize=16,
+        textColor=colors.HexColor('#34495e'),
+        spaceAfter=12,
+        spaceBefore=12
+    )
+
+    # Normal style
+    normal_style = ParagraphStyle(
+        'CustomNormal',
+        parent=styles['Normal'],
+        fontSize=11,
+        spaceAfter=10
+    )
+
+    # Title
+    elements.append(Paragraph("Oral Quiz Grading Report", title_style))
+    elements.append(Spacer(1, 12))
+
+    # Student info
+    elements.append(Paragraph(f"<b>Student:</b> {submission_data['username']}", normal_style))
+    elements.append(Paragraph(f"<b>Submission Date:</b> {submission_data.get('timestamp_readable', 'N/A')}", normal_style))
+    elements.append(Paragraph(f"<b>Submission ID:</b> {submission_id}", normal_style))
+    elements.append(Spacer(1, 20))
+
+    # Overall score
+    total_score = submission_data['grading_result'].get('total_score', 'N/A')
+    elements.append(Paragraph(f"<b>Total Score: {total_score}/100</b>", heading_style))
+    elements.append(Spacer(1, 12))
+
+    # Category scores table
+    if 'category_scores' in submission_data['grading_result']:
+        elements.append(Paragraph("Category Breakdown", heading_style))
+
+        category_data = [
+            ['Category', 'Score', 'Maximum'],
+            ['Conceptual Understanding',
+             str(submission_data['grading_result']['category_scores'].get('conceptual_understanding', 'N/A')),
+             '20'],
+            ['Application of Theories',
+             str(submission_data['grading_result']['category_scores'].get('application_of_theories', 'N/A')),
+             '15'],
+            ['Use of Terminology',
+             str(submission_data['grading_result']['category_scores'].get('use_of_terminology', 'N/A')),
+             '15'],
+            ['Critical Thinking',
+             str(submission_data['grading_result']['category_scores'].get('critical_thinking', 'N/A')),
+             '15'],
+            ['Clarity of Explanation',
+             str(submission_data['grading_result']['category_scores'].get('clarity_of_explanation', 'N/A')),
+             '15'],
+            ['Completeness',
+             str(submission_data['grading_result']['category_scores'].get('completeness', 'N/A')),
+             '10'],
+            ['Examples and Evidence',
+             str(submission_data['grading_result']['category_scores'].get('examples_and_evidence', 'N/A')),
+             '10']
+        ]
+
+        category_table = Table(category_data, colWidths=[3.5*inch, 1*inch, 1*inch])
+        category_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3498db')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+
+        elements.append(category_table)
+        elements.append(Spacer(1, 20))
+
+    # Feedback sections
+    if 'strengths' in submission_data['grading_result']:
+        elements.append(Paragraph("Strengths", heading_style))
+        for strength in submission_data['grading_result']['strengths']:
+            elements.append(Paragraph(f"• {strength}", normal_style))
+        elements.append(Spacer(1, 12))
+
+    if 'improvements' in submission_data['grading_result']:
+        elements.append(Paragraph("Areas for Improvement", heading_style))
+        for improvement in submission_data['grading_result']['improvements']:
+            elements.append(Paragraph(f"• {improvement}", normal_style))
+        elements.append(Spacer(1, 12))
+
+    if 'overall_comments' in submission_data['grading_result']:
+        elements.append(Paragraph("Overall Comments", heading_style))
+        elements.append(Paragraph(submission_data['grading_result']['overall_comments'], normal_style))
+        elements.append(Spacer(1, 20))
+
+    # Transcript section
+    elements.append(Paragraph("Transcript", heading_style))
+    transcript_text = submission_data.get('transcript_text', 'No transcript available')
+    # Split long transcript into paragraphs for better PDF formatting
+    for para in transcript_text.split('\n'):
+        if para.strip():
+            elements.append(Paragraph(para, normal_style))
+
+    # Build PDF
+    doc.build(elements)
+
+    # Prepare response
+    pdf_buffer.seek(0)
+    return send_file(
+        pdf_buffer,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=f'quiz_results_{submission_id}.pdf'
+    )
+
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
