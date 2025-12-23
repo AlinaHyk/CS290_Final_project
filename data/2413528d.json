@@ -1,0 +1,91 @@
+{
+  "submission_id": "2413528d",
+  "username": "student1",
+  "timestamp": "20251222_163321",
+  "timestamp_readable": "December 22, 2025 at 04:33 PM",
+  "files": {
+    "video": "uploads\\20251222_163321_2413528d\\recording_2413528d.webm",
+    "audio": "uploads\\20251222_163321_2413528d\\audio_2413528d.mp3",
+    "transcript": "uploads\\20251222_163321_2413528d\\transcript_2413528d.txt"
+  },
+  "transcript_text": " you you",
+  "grading_result": {
+    "total_score": 0,
+    "category_scores": {
+      "conceptual_understanding": 0,
+      "application_of_theories": 0,
+      "use_of_terminology": 0,
+      "critical_thinking": 0,
+      "clarity_of_explanation": 0,
+      "completeness": 0,
+      "examples_and_evidence": 0
+    },
+    "grading_reasoning": "The student's response consists only of 'you you' which provides no substantive content whatsoever. CONCEPTUAL UNDERSTANDING (0/20): No psychological concepts were addressed or demonstrated. APPLICATION OF THEORIES (0/15): No theories were mentioned or applied to any examples. USE OF TERMINOLOGY (0/15): No psychological terminology was used appropriately or inappropriately. CRITICAL THINKING (0/15): No analysis, evaluation, or critical thinking was demonstrated. CLARITY OF EXPLANATION (0/15): While the two words are clear, they provide no explanation of any psychological content. COMPLETENESS (0/10): None of the 10 quiz questions were answered in any capacity. EXAMPLES AND EVIDENCE (0/10): No examples or evidence were provided for any concepts.",
+    "strengths": [],
+    "improvements": [
+      "Study all fundamental psychology concepts covered in class",
+      "Practice explaining psychological theories in your own words",
+      "Learn proper psychological terminology and definitions",
+      "Prepare specific examples to illustrate psychological concepts",
+      "Practice answering questions completely and thoroughly",
+      "Develop critical thinking skills by analyzing psychological phenomena",
+      "Work on organizing responses clearly and logically",
+      "Review all course materials before the next assessment",
+      "Consider seeking additional help or tutoring",
+      "Practice oral presentation skills for better delivery"
+    ],
+    "overall_comments": "This response demonstrates a complete lack of preparation and engagement with the quiz material. The student provided no substantive answers to any of the 10 questions covering fundamental psychology concepts. This suggests either a significant misunderstanding of the assignment requirements, technical difficulties during the oral quiz, or lack of preparation. I strongly recommend meeting with the instructor to discuss study strategies, reviewing all course materials, and potentially retaking this assessment after adequate preparation. The student needs to demonstrate basic understanding of core psychological concepts including learning theories, memory, motivation, cognitive biases, developmental psychology, and neuropsychology before progressing further in the course."
+  },
+  "questions": [
+    {
+      "id": 1,
+      "question": "Explain the difference between classical conditioning and operant conditioning. Provide an example of each.",
+      "points": 10
+    },
+    {
+      "id": 2,
+      "question": "What is cognitive dissonance? Describe a situation where someone might experience it and how they might resolve it.",
+      "points": 10
+    },
+    {
+      "id": 3,
+      "question": "Describe Maslow's hierarchy of needs and explain why the order of the levels matters.",
+      "points": 10
+    },
+    {
+      "id": 4,
+      "question": "What is the difference between short-term memory and long-term memory? How does information transfer between them?",
+      "points": 10
+    },
+    {
+      "id": 5,
+      "question": "Explain the bystander effect and describe the psychological factors that contribute to it.",
+      "points": 10
+    },
+    {
+      "id": 6,
+      "question": "What are the main differences between the psychoanalytic and humanistic approaches to psychology?",
+      "points": 10
+    },
+    {
+      "id": 7,
+      "question": "Describe the stages of Erikson's psychosocial development theory. Focus on two stages and their key conflicts.",
+      "points": 10
+    },
+    {
+      "id": 8,
+      "question": "What is confirmation bias and how does it affect decision-making in everyday life?",
+      "points": 10
+    },
+    {
+      "id": 9,
+      "question": "Explain the difference between intrinsic and extrinsic motivation. Which is generally more effective for long-term behavior change and why?",
+      "points": 10
+    },
+    {
+      "id": 10,
+      "question": "What is the role of the amygdala in emotional processing? How does it interact with the prefrontal cortex?",
+      "points": 10
+    }
+  ]
+}

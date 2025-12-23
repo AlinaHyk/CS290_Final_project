@@ -1,0 +1,58 @@
+{
+  "submission_id": "e8e1fb2d",
+  "username": "student1",
+  "timestamp": "20251222_165106",
+  "timestamp_readable": "December 22, 2025 at 04:51 PM",
+  "files": {
+    "video": "uploads\\20251222_165106_e8e1fb2d\\recording_e8e1fb2d.webm",
+    "audio": "uploads\\20251222_165106_e8e1fb2d\\audio_e8e1fb2d.mp3",
+    "transcript": "uploads\\20251222_165106_e8e1fb2d\\transcript_e8e1fb2d.txt"
+  },
+  "transcript_text": " Classical conditioning involves learning through association between two stimuli, whereas operant conditioning involves learning through consequences of behavior. Cognitive dissonance is the psychological discomfort that arises when a person holds conflict in beliefs when their behavior conflicts with their beliefs. For example, somebody who values health but smokes, they resolve this discomfort by quitting smoking or by downplaying the health risks. Confirmation bias is the tendency to seek out interpret and remember information that supports ones existing beliefs while ignoring contradictory evidence. In everyday decision making, this can lead people to make poor choices, such as only reading news that aligns with their political views, becoming more confident and inaccurate beliefs.",
+  "grading_result": {
+    "total_score": 70,
+    "category_scores": {
+      "conceptual_understanding": 15,
+      "application_of_theories": 10,
+      "use_of_terminology": 12,
+      "critical_thinking": 8,
+      "clarity_of_explanation": 8,
+      "completeness": 8,
+      "examples_and_evidence": 9
+    },
+    "grading_reasoning": "Conceptual Understanding (15/20): Student demonstrates good understanding of all three concepts with minor gaps. Classical vs operant conditioning distinction is correct but lacks depth. Cognitive dissonance definition is accurate. Confirmation bias understanding is solid. Application of Theories (10/15): Student correctly applies cognitive dissonance theory with the smoking example and applies confirmation bias to decision-making, but fails to provide concrete examples for classical and operant conditioning as requested. Use of Terminology (12/15): Mostly accurate use of psychological terms including 'classical conditioning,' 'operant conditioning,' 'cognitive dissonance,' and 'confirmation bias.' Some minor grammatical issues but terminology is appropriate. Critical Thinking (8/15): Shows some analysis, particularly in explaining how cognitive dissonance is resolved and how confirmation bias affects decision-making, but lacks deeper evaluation or consideration of nuances. Clarity of Explanation (8/15): Mostly clear but has some organizational issues and minor grammatical problems that affect flow. Ideas are understandable but could be better structured. Completeness (8/10): Addresses all three questions but Q1 lacks the required specific examples for both types of conditioning. Other questions are adequately complete. Examples and Evidence (9/10): Provides good specific example for cognitive dissonance (health-conscious smoker) and relevant example for confirmation bias (political news consumption), but missing concrete examples for conditioning types.",
+    "strengths": [
+      "Accurate basic definitions of all three psychological concepts",
+      "Provided relevant and relatable examples for cognitive dissonance and confirmation bias",
+      "Demonstrated understanding of how psychological concepts apply to real-world situations",
+      "Used appropriate psychological terminology throughout responses",
+      "Showed insight into resolution mechanisms for cognitive dissonance"
+    ],
+    "improvements": [
+      "Provide specific examples for both classical and operant conditioning as requested in Q1",
+      "Elaborate more on the mechanisms and processes underlying each concept",
+      "Improve organization and flow of explanations",
+      "Include more detailed analysis of how these concepts work",
+      "Address grammatical issues to enhance clarity",
+      "Expand on the consequences and implications of these psychological phenomena"
+    ],
+    "overall_comments": "The student demonstrates solid foundational knowledge of the three psychological concepts and can apply them to real-world situations. The responses show good conceptual grasp and appropriate use of terminology. However, the student missed providing specific examples for classical and operant conditioning as explicitly requested, and the explanations could benefit from greater depth and better organization. The examples provided for cognitive dissonance and confirmation bias were particularly strong and showed good practical understanding. To improve, focus on fully addressing all parts of each question and providing more detailed explanations with concrete examples."
+  },
+  "questions": [
+    {
+      "id": 1,
+      "question": "Explain the difference between classical conditioning and operant conditioning. Provide an example of each.",
+      "points": 10
+    },
+    {
+      "id": 2,
+      "question": "What is cognitive dissonance? Describe a situation where someone might experience it and how they might resolve it.",
+      "points": 10
+    },
+    {
+      "id": 8,
+      "question": "What is confirmation bias and how does it affect decision-making in everyday life?",
+      "points": 10
+    }
+  ]
+}

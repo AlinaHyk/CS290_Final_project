@@ -1,0 +1,58 @@
+{
+  "submission_id": "c9df41b1",
+  "username": "student1",
+  "timestamp": "20251222_164101",
+  "timestamp_readable": "December 22, 2025 at 04:41 PM",
+  "files": {
+    "video": "uploads\\20251222_164101_c9df41b1\\recording_c9df41b1.webm",
+    "audio": "uploads\\20251222_164101_c9df41b1\\audio_c9df41b1.mp3",
+    "transcript": "uploads\\20251222_164101_c9df41b1\\transcript_c9df41b1.txt"
+  },
+  "transcript_text": " A classical conditioning involves learning by association, by associating to stimuli, whereas operant conditioning involves learning through consequences. Conductive dissonance is a psychological discomfort that rises when a person holds conflicting beliefs or behaviors. And confirmation bias is the tendency to seek out, interpret or remember information that supports existing beliefs.",
+  "grading_result": {
+    "total_score": 37,
+    "category_scores": {
+      "conceptual_understanding": 10,
+      "application_of_theories": 4,
+      "use_of_terminology": 8,
+      "critical_thinking": 4,
+      "clarity_of_explanation": 8,
+      "completeness": 2,
+      "examples_and_evidence": 1
+    },
+    "grading_reasoning": "Conceptual Understanding (10/20): Student demonstrates basic understanding of the three concepts but lacks depth. The definitions are overly simplified and missing key components. For classical conditioning, they mention 'associating to stimuli' but don't explain the relationship between unconditioned/conditioned stimuli and responses. Application of Theories (4/15): Very limited application. No examples were provided despite being explicitly asked for in Q1 and Q2. The student failed to demonstrate how these theories work in practice. Use of Terminology (8/15): Student uses some correct psychological terms (classical conditioning, operant conditioning, cognitive dissonance, confirmation bias) but makes an error ('conductive dissonance' instead of 'cognitive dissonance') and doesn't use more specific terminology like UCS, UCR, reinforcement, punishment, etc. Critical Thinking (4/15): Limited analysis shown. Student doesn't explain mechanisms, processes, or implications of these concepts. No evaluation or deeper thinking about how these concepts relate to behavior or cognition. Clarity of Explanation (8/15): Responses are brief and mostly clear in structure, but lack elaboration. The mispronunciation/error with 'conductive' affects clarity slightly. Completeness (2/10): Severely incomplete. Student provided only basic definitions and failed to address major parts of each question - no examples for Q1, no situation or resolution strategies for Q2, and no explanation of how confirmation bias affects decision-making for Q8. Examples and Evidence (1/10): No examples provided despite being explicitly requested. This is a critical omission that significantly impacts the quality of responses.",
+    "strengths": [
+      "Demonstrates basic knowledge of fundamental psychological concepts",
+      "Provides concise definitions that show general understanding",
+      "Uses appropriate psychological terminology in most cases",
+      "Responses are organized and easy to follow"
+    ],
+    "improvements": [
+      "Provide specific examples when asked - this was explicitly required for all three questions",
+      "Elaborate on definitions with more detail about underlying mechanisms and processes",
+      "Address all parts of each question completely (situations, resolution strategies, effects on decision-making)",
+      "Use more precise psychological terminology (UCS, UCR, reinforcement, punishment, etc.)",
+      "Demonstrate critical thinking by explaining how and why these concepts work",
+      "Practice pronunciation and spelling of psychological terms (cognitive vs. conductive dissonance)",
+      "Expand responses to show deeper understanding rather than just surface-level definitions"
+    ],
+    "overall_comments": "The student demonstrates basic familiarity with important psychological concepts but provides responses that are far too brief and incomplete for this level of assessment. While the fundamental definitions show some understanding, the complete absence of examples and failure to address the specific situational applications requested significantly weakens the performance. The student needs to focus on providing comprehensive answers that include both theoretical understanding and practical applications with concrete examples."
+  },
+  "questions": [
+    {
+      "id": 1,
+      "question": "Explain the difference between classical conditioning and operant conditioning. Provide an example of each.",
+      "points": 10
+    },
+    {
+      "id": 2,
+      "question": "What is cognitive dissonance? Describe a situation where someone might experience it and how they might resolve it.",
+      "points": 10
+    },
+    {
+      "id": 8,
+      "question": "What is confirmation bias and how does it affect decision-making in everyday life?",
+      "points": 10
+    }
+  ]
+}

@@ -164,46 +164,46 @@ QUIZ_QUESTIONS = [
         "question": "What is cognitive dissonance? Describe a situation where someone might experience it and how they might resolve it.",
         "points": 10
     },
-    {
-        "id": 3,
-        "question": "Describe Maslow's hierarchy of needs and explain why the order of the levels matters.",
-        "points": 10
-    },
-    {
-        "id": 4,
-        "question": "What is the difference between short-term memory and long-term memory? How does information transfer between them?",
-        "points": 10
-    },
-    {
-        "id": 5,
-        "question": "Explain the bystander effect and describe the psychological factors that contribute to it.",
-        "points": 10
-    },
-    {
-        "id": 6,
-        "question": "What are the main differences between the psychoanalytic and humanistic approaches to psychology?",
-        "points": 10
-    },
-    {
-        "id": 7,
-        "question": "Describe the stages of Erikson's psychosocial development theory. Focus on two stages and their key conflicts.",
-        "points": 10
-    },
+    # {
+    #     "id": 3,
+    #     "question": "Describe Maslow's hierarchy of needs and explain why the order of the levels matters.",
+    #     "points": 10
+    # },
+    # {
+    #     "id": 4,
+    #     "question": "What is the difference between short-term memory and long-term memory? How does information transfer between them?",
+    #     "points": 10
+    # },
+    # {
+    #     "id": 5,
+    #     "question": "Explain the bystander effect and describe the psychological factors that contribute to it.",
+    #     "points": 10
+    # },
+    # {
+    #     "id": 6,
+    #     "question": "What are the main differences between the psychoanalytic and humanistic approaches to psychology?",
+    #     "points": 10
+    # },
+    # {
+    #     "id": 7,
+    #     "question": "Describe the stages of Erikson's psychosocial development theory. Focus on two stages and their key conflicts.",
+    #     "points": 10
+    # },
     {
         "id": 8,
         "question": "What is confirmation bias and how does it affect decision-making in everyday life?",
         "points": 10
     },
-    {
-        "id": 9,
-        "question": "Explain the difference between intrinsic and extrinsic motivation. Which is generally more effective for long-term behavior change and why?",
-        "points": 10
-    },
-    {
-        "id": 10,
-        "question": "What is the role of the amygdala in emotional processing? How does it interact with the prefrontal cortex?",
-        "points": 10
-    }
+    # {
+    #     "id": 9,
+    #     "question": "Explain the difference between intrinsic and extrinsic motivation. Which is generally more effective for long-term behavior change and why?",
+    #     "points": 10
+    # },
+    # {
+    #     "id": 10,
+    #     "question": "What is the role of the amygdala in emotional processing? How does it interact with the prefrontal cortex?",
+    #     "points": 10
+    # }
 ]
 
 
@@ -235,6 +235,20 @@ def save_host_settings(settings):
     """Save host settings"""
     with open(app.config['SETTINGS_FILE'], 'w') as f:
         json.dump(settings, f, indent=2)
+
+def load_quiz_questions():
+    """Load quiz questions from file or return defaults"""
+    questions_file = os.path.join(app.config['DATA_FOLDER'], 'quiz_questions.json')
+    if os.path.exists(questions_file):
+        with open(questions_file, 'r') as f:
+            return json.load(f)
+    return QUIZ_QUESTIONS
+
+def save_quiz_questions(questions):
+    """Save quiz questions to file"""
+    questions_file = os.path.join(app.config['DATA_FOLDER'], 'quiz_questions.json')
+    with open(questions_file, 'w') as f:
+        json.dump(questions, f, indent=2)
 
 def login_required(f):
     """Decorator to require user login"""
@@ -326,13 +340,15 @@ def index():
     """Main recording page"""
     if session.get('is_host'):
         return redirect(url_for('host_dashboard'))
-    return render_template('index.html', questions=QUIZ_QUESTIONS, username=session['user'])
+    questions = load_quiz_questions()
+    return render_template('index.html', questions=questions, username=session['user'])
 
 @app.route('/api/questions')
 @login_required
 def get_questions():
     """Return quiz questions as JSON"""
-    return jsonify(QUIZ_QUESTIONS)
+    questions = load_quiz_questions()
+    return jsonify(questions)
 
 #Uploading prosessing:
 @app.route('/upload', methods=['POST'])
@@ -384,10 +400,13 @@ def upload_video():
         transcript_path = os.path.join(submission_dir, transcript_filename)
         with open(transcript_path, 'w') as f:
             f.write(transcript)
-        
+
+        # Load current quiz questions
+        quiz_questions = load_quiz_questions()
+
         # Grade with LLM
-        grading_result = grade_with_llm(transcript, QUIZ_QUESTIONS)
-        
+        grading_result = grade_with_llm(transcript, quiz_questions)
+
         # Save submission data
         submission_data = {
             'submission_id': submission_id,
@@ -401,7 +420,7 @@ def upload_video():
             },
             'transcript_text': transcript,
             'grading_result': grading_result,
-            'questions': QUIZ_QUESTIONS
+            'questions': quiz_questions
         }
         
         data_path = os.path.join(app.config['DATA_FOLDER'], f"{submission_id}.json")
@@ -648,10 +667,11 @@ def host_dashboard():
                 with open(filepath, 'r') as f:
                     data = json.load(f)
                     submissions.append({
-                        'id': data['submission_id'],
+                        'submission_id': data['submission_id'],
                         'username': data['username'],
-                        'timestamp': data.get('timestamp_readable', data.get('timestamp', 'Unknown')),
-                        'score': data['grading_result'].get('total_score', 'N/A')
+                        'timestamp': data.get('timestamp', 'Unknown'),
+                        'timestamp_readable': data.get('timestamp_readable', data.get('timestamp', 'Unknown')),
+                        'grading_result': data.get('grading_result', {})
                     })
 
     # Sort by most recent first
@@ -680,6 +700,47 @@ def host_settings():
     return render_template('host_settings.html',
                          current_prompt=current_prompt,
                          default_prompt=DEFAULT_GRADING_RUBRIC,
+                         message=message,
+                         username=session['user'])
+
+
+@app.route('/host/questions', methods=['GET', 'POST'])
+@host_required
+def host_questions():
+    """Host page for editing quiz questions"""
+    message = None
+
+    if request.method == 'POST':
+        # Get form data
+        questions = []
+        question_count = int(request.form.get('question_count', 0))
+
+        for i in range(question_count):
+            question_text = request.form.get(f'question_{i}', '').strip()
+            points = request.form.get(f'points_{i}', '10').strip()
+
+            if question_text:  # Only add non-empty questions
+                try:
+                    points_int = int(points)
+                except ValueError:
+                    points_int = 10
+
+                questions.append({
+                    'id': i + 1,
+                    'question': question_text,
+                    'points': points_int
+                })
+
+        if questions:
+            save_quiz_questions(questions)
+            message = "Quiz questions saved successfully!"
+        else:
+            message = "Error: No valid questions provided."
+
+    current_questions = load_quiz_questions()
+
+    return render_template('host_questions.html',
+                         questions=current_questions,
                          message=message,
                          username=session['user'])
 

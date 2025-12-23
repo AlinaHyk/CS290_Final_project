@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Quiz Questions | Oral Assignment Grader</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        .question-item {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .question-number {
+            font-weight: 600;
+            color: #dc4405;
+            font-size: 16px;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        .question-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            margin-bottom: 12px;
+            resize: vertical;
+            min-height: 80px;
+        }
+        .points-input {
+            width: 100px;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .points-label {
+            display: inline-block;
+            margin-right: 8px;
+            font-weight: 500;
+        }
+        .add-question-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .add-question-btn:hover {
+            background: #218838;
+        }
+        .alert {
+            padding: 12px 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .alert-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .instructions {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo">
+                <a href="{{ url_for('host_dashboard') }}" class="logo-link">
+                    <span class="logo-osu">OSU</span>
+                    <h1>Oral Assignment Grader</h1>
+                </a>
+            </div>
+            <div class="header-info">
+                <span class="host-badge">HOST</span>
+                <a href="{{ url_for('host_dashboard') }}" class="btn btn-small btn-secondary">Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-small btn-outline">Logout</a>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h2>Edit Quiz Questions</h2>
+                <p>Configure the questions students will answer during the oral quiz</p>
+            </div>
+
+            {% if message %}
+            <div class="alert {% if 'Error' in message %}alert-error{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+            {% endif %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Quiz Questions</h3>
+                </div>
+                <div class="card-body">
+                    <p class="instructions">
+                        Add, edit, or remove questions below. Each question should have a clear prompt and point value.
+                        Students will see these questions during their oral quiz session.
+                    </p>
+
+                    <form method="POST" id="questions-form">
+                        <div id="questions-container">
+                            {% for q in questions %}
+                            <div class="question-item" data-question-index="{{ loop.index0 }}">
+                                <div class="question-header">
+                                    <span class="question-number">Question {{ loop.index }}</span>
+                                    <button type="button" class="delete-btn" onclick="deleteQuestion(this)">Delete</button>
+                                </div>
+                                <textarea
+                                    name="question_{{ loop.index0 }}"
+                                    class="question-input"
+                                    placeholder="Enter question text..."
+                                    required>{{ q.question }}</textarea>
+                                <div>
+                                    <span class="points-label">Points:</span>
+                                    <input
+                                        type="number"
+                                        name="points_{{ loop.index0 }}"
+                                        class="points-input"
+                                        value="{{ q.points }}"
+                                        min="1"
+                                        max="100"
+                                        required>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="button" class="add-question-btn" onclick="addQuestion()">+ Add Question</button>
+
+                        <input type="hidden" name="question_count" id="question_count" value="{{ questions|length }}">
+
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary">Save Questions</button>
+                            <a href="{{ url_for('host_dashboard') }}" class="btn btn-outline">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Oral Assignment Grader - Joseph Slade and Alina Hyk - CS 290</p>
+        </footer>
+    </div>
+
+    <script>
+        let questionCount = {{ questions|length }};
+
+        function addQuestion() {
+            const container = document.getElementById('questions-container');
+            const index = questionCount;
+            questionCount++;
+
+            const questionItem = document.createElement('div');
+            questionItem.className = 'question-item';
+            questionItem.setAttribute('data-question-index', index);
+            questionItem.innerHTML = `
+                <div class="question-header">
+                    <span class="question-number">Question ${questionCount}</span>
+                    <button type="button" class="delete-btn" onclick="deleteQuestion(this)">Delete</button>
+                </div>
+                <textarea
+                    name="question_${index}"
+                    class="question-input"
+                    placeholder="Enter question text..."
+                    required></textarea>
+                <div>
+                    <span class="points-label">Points:</span>
+                    <input
+                        type="number"
+                        name="points_${index}"
+                        class="points-input"
+                        value="10"
+                        min="1"
+                        max="100"
+                        required>
+                </div>
+            `;
+
+            container.appendChild(questionItem);
+            updateQuestionCount();
+            renumberQuestions();
+        }
+
+        function deleteQuestion(btn) {
+            if (confirm('Are you sure you want to delete this question?')) {
+                btn.closest('.question-item').remove();
+                questionCount--;
+                renumberQuestions();
+                updateQuestionCount();
+            }
+        }
+
+        function renumberQuestions() {
+            const items = document.querySelectorAll('.question-item');
+            items.forEach((item, index) => {
+                const numberSpan = item.querySelector('.question-number');
+                numberSpan.textContent = `Question ${index + 1}`;
+
+                // Update input names
+                const textarea = item.querySelector('textarea');
+                const pointsInput = item.querySelector('.points-input');
+
+                textarea.name = `question_${index}`;
+                pointsInput.name = `points_${index}`;
+                item.setAttribute('data-question-index', index);
+            });
+        }
+
+        function updateQuestionCount() {
+            const items = document.querySelectorAll('.question-item');
+            document.getElementById('question_count').value = items.length;
+        }
+
+        // Initial setup
+        updateQuestionCount();
+    </script>
+</body>
+</html>
